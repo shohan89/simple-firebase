@@ -1,13 +1,16 @@
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+import { getAuth, GithubAuthProvider, GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
 import { useState } from "react";
 import app from "../firebase/firebase.init";
 
 const Login = () => {
     const [user, setUser] = useState(null);
     const auth  = getAuth(app);
-    const provider = new GoogleAuthProvider();
+    const googleProvider = new GoogleAuthProvider();
+    const githubProvider = new GithubAuthProvider();
+
+    // Sign in with Google
     const handleGoogleSignIn = () =>{
-        signInWithPopup(auth, provider)
+        signInWithPopup(auth, googleProvider)
             .then(result => {
                 const loggedInUser = result.user;
                 console.log("🚀 ~ handleGoogleSignIn ~ user:", loggedInUser);
@@ -16,6 +19,18 @@ const Login = () => {
             .catch(error => {
                 console.error("Error signin with Google:", error.message);
             })
+    }
+
+    // Sign in with Github
+    const handleGithubSignIn = () => {
+        signInWithPopup(auth, githubProvider).then(result => {
+            const loggedInUser = result.user;
+            console.log("🚀 ~ handleGithubSignIn ~ loggedInUser:", loggedInUser);
+            setUser(loggedInUser);
+        })
+        .catch(error => {
+            console.error("Error signing in with Github: ", error.message);
+        })
     }
     const handleSignOut = () => {
         signOut(auth).then(result =>{
@@ -31,7 +46,12 @@ const Login = () => {
             {
                 user ?
                 <button onClick={handleSignOut}>SignOut</button> :
-                <button onClick={handleGoogleSignIn}>SignIn With Google</button>}
+                <div>
+                    <button onClick={handleGoogleSignIn}>SignIn With Google</button>
+                    <button onClick={handleGithubSignIn}>SignIn With Github</button>
+                </div>
+                
+                }
             {
                 user && <div>
                     <h2>Welcome, {user.displayName}</h2>
